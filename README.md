@@ -47,6 +47,7 @@ Unpacking https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.6
 ```
 Notice how Jenkins installs maven at <code>/var/jenkins_home/tools/hudson.tasks.Maven_MavenInstallation/maven_3.6.3</code> on the Jenkins instance.
 
+Whatever the maven installation we use, Jenkins will configure it to use the JDK we are using in our build, see below.
 
 ## JDK
 
@@ -87,21 +88,23 @@ JVM_VERSION="25.292-b10"
 IMAGE_TYPE="JDK"
 ```
 
-Jenkins will use this JDK by default, if nothing is specified, for example in Freestyle project.
+Jenkins will use this JDK by default, if nothing is specified, for example in Freestyle or Pipeline project.
 
-Other than the default JDK we can install ours under Global Tool Configuration. We'll have to set a name to each JDK installation so we can refer to it Jenkins files.
+Other than the default JDK, we can install ours under Global Tool Configuration. We'll have to set a name for each JDK installation so we can refer to them in Jenkins files.
+
+
 
 ### JDK from a download URL
-Another option is to specify the url of a JDK to download and install automatically. We do it under Add Installer > Extract *.zip/*.tar.gz. An example link for a JDK 8 could be<br>
-<code>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u322-b06/OpenJDK8U-debugimage_x64_linux_hotspot_8u322b06.tar.gz</code>
-See (https://github.com/adoptium/temurin8-binaries/releases/)[https://github.com/adoptium/temurin8-binaries/releases/] for JDK URLs from Adopt, for example. Look for assets with "x64_linux_hotspot" in its name.
-
+An option is to specify the url of a JDK to download and install automatically. We do it under Add Installer > Extract *.zip/*.tar.gz. An example link for a JDK 8 could be<br>
+<code>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u322-b06/OpenJDK8U-jdk_x64_linux_hotspot_8u322b06.tar.gz</code>
+See (https://github.com/adoptium/temurin8-binaries/releases/)[https://github.com/adoptium/temurin8-binaries/releases/] for JDK URLs from Adopt, for example. Look for assets with "x64_linux_hotspot" in its name, not debugimage or alpine-linux. Jenkins will download this JDK the first time it encounters a build that needs it.
 
 ### JDK from Oracle
 Jenkins gives the option of automatically downloading and installing a JDK from Oracle, just that we'll need to provide our Oracle account credentials the first time. We'll see "Installing JDK requires Oracle account. Please enter your username/password". JDK installed this way will be places ad <code>/var/jenkins_home/tools/hudson.model.JDK</code>.
 
 ### Manual install of a JDK
-To manually add a JDK, we can manually copy (extract the .tar.gz) a JDK into <code>/usr/lib/jvm</code>:
+We can click in "Delete Installer" to delete the Oracle installer Jenkins propose us by default, and uncheck "Install Automatically" as well, to manually install a JDK.
+To do it, we can manually copy (extract the .tar.gz) a JDK into <code>/usr/lib/jvm</code>:
 ```shell
 /usr/lib/jvm/jdk-11.0.12+1$ ls -larth
 total 40K
@@ -118,3 +121,4 @@ drwxr-xr-x  3 root root 4.0K Apr 29 10:22 ..
 ```
 If we want to use it we can set it in Global Tool Configuration, specifying under <b>JAVA_HOME</b> the installation directory <code>/usr/lib/jvm/jdk-11.0.12+1</code>.
 
+When using Agents to run Jenkins builds, it is in the agents we need the JDKs installed.

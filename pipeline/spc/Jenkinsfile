@@ -1,9 +1,11 @@
 pipeline {
     agent any
 
+    // we can put tools inside a stage, ie. stage level, before the steps{} block
     tools {
         // Install this Maven version already configured
         maven "maven_3_6_3"
+        jdk "openjdk11"
     }
 
     stages {
