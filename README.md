@@ -36,3 +36,71 @@ See the [docs](docs) folder for various additional notes I've left for you. Quit
 - [1st Edition Overview/Resources Gist (https://git.io/vKSVZ)](https://git.io/vKSVZ)
   - I share these mostly to avoid confusion with associated repos and examples that are and will continue to remain accessibly here on GitHub.
 - This `Jenkinsfile` highlights a complex pipeline with multiple nodes involved and parallelism, for a challenge try to get this up and running on your own. Or at least read through it and grok what you think is needed to get it working.
+
+
+# My Notes
+
+## Maven
+Jenkins will need maven configured. In Global Tool Configuration we can easily ask it to automatically install the maven versions we want from Apache, while giving a name to each installation. For example, if we decide to use version 3.6.3, this will be printed on the logs on the first time:
+```shell
+Unpacking https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.6.3/apache-maven-3.6.3-bin.zip to /var/jenkins_home/tools/hudson.tasks.Maven_MavenInstallation/maven_3.6.3 on Jenkins
+```
+Notice how Jenkins installs maven at <code>/var/jenkins_home/tools/hudson.tasks.Maven_MavenInstallation/maven_3.6.3</code> on the Jenkins instance.
+
+
+## JDK
+It seems Jenkins comes with a default JDK at 
+```shell
+/opt/java/openjdk$ ls -larth
+total 51M
+drwxr-xr-x  3 root root 4.0K Apr 20  2021 lib
+-r--r--r--  1 root root 152K Apr 20  2021 THIRD_PARTY_README
+drwxr-xr-x 10 root root 4.0K Apr 20  2021 sample
+drwxr-xr-x  4 root root 4.0K Apr 20  2021 man
+-r--r--r--  1 root root  19K Apr 20  2021 LICENSE
+drwxr-xr-x  4 root root 4.0K Apr 20  2021 jre
+drwxr-xr-x  3 root root 4.0K Apr 20  2021 include
+-r--r--r--  1 root root 1.5K Apr 20  2021 ASSEMBLY_EXCEPTION
+-rw-r--r--  1 root root  51M Apr 20  2021 src.zip
+-rw-r--r--  1 root root  333 Apr 20  2021 release
+drwxr-xr-x  2 root root 4.0K Apr 20  2021 bin
+drwxr-xr-x  3 root root 4.0K Jun 23  2021 ..
+drwxr-xr-x  8 root root 4.0K Jun 23  2021 .
+```
+```shell
+/opt/java/openjdk$ cat release 
+JAVA_VERSION="1.8.0_292"
+OS_NAME="Linux"
+OS_VERSION="2.6"
+OS_ARCH="amd64"
+SOURCE=" .:OpenJDK: 008caa03f0:"
+IMPLEMENTOR="AdoptOpenJDK"
+BUILD_SOURCE="git:4ad15fd"
+FULL_VERSION="1.8.0_292-b10"
+SEMANTIC_VERSION="8.0.292+1"
+BUILD_INFO="OS: Linux Version: 4.15.0-1113-azure"
+JVM_VARIANT="Hotspot"
+JVM_VERSION="25.292-b10"
+IMAGE_TYPE="JDK"
+```
+
+It seems Jenkins will use this JDK by default, if nothing is specified, for example in Freestyle project.
+
+We can manually copy (extract the .tar.gz) a JDK into <code>/usr/lib/jvm</code>:
+```shell
+/usr/lib/jvm/jdk-11.0.12+1$ ls -larth
+total 40K
+drwxr-xr-x  4 root root 4.0K May  6  2021 man
+drwxr-xr-x 73 root root 4.0K May  6  2021 legal
+drwxr-xr-x  2 root root 4.0K May  6  2021 jmods
+drwxr-xr-x  3 root root 4.0K May  6  2021 include
+drwxr-xr-x  4 root root 4.0K May  6  2021 conf
+-rw-r--r--  1 root root 1.5K May  6  2021 release
+drwxr-xr-x  9 root root 4.0K May  6  2021 .
+drwxr-xr-x  6 root root 4.0K May  6  2021 lib
+drwxr-xr-x  2 root root 4.0K May  6  2021 bin
+drwxr-xr-x  3 root root 4.0K Apr 29 10:22 ..
+```
+If we want to use it we can set it in Global Tool Configuration, specifying under <b>JAVA_HOME</b> the installation directory <code>/usr/lib/jvm/jdk-11.0.12+1</code>.
+
+Each JDK installation will have name we can refer to in the Jenkins files.
