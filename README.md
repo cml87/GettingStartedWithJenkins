@@ -97,7 +97,9 @@ Other than the default JDK, we can install ours under Global Tool Configuration.
 ### JDK from a download URL
 An option is to specify the url of a JDK to download and install automatically. We do it under Add Installer > Extract *.zip/*.tar.gz. An example link for a JDK 8 could be<br>
 <code>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u322-b06/OpenJDK8U-jdk_x64_linux_hotspot_8u322b06.tar.gz</code>
-See (https://github.com/adoptium/temurin8-binaries/releases/)[https://github.com/adoptium/temurin8-binaries/releases/] for JDK URLs from Adopt, for example. Look for assets with "x64_linux_hotspot" in its name, not debugimage or alpine-linux. Jenkins will download this JDK the first time it encounters a build that needs it.
+See https://github.com/adoptium/temurin8-binaries/releases/ for JDK URLs from Adopt, for example. Look for assets with "x64_linux_hotspot" in its name, not debugimage or alpine-linux. Jenkins will download this JDK the first time it encounters a build that needs it.
+Notice that JDKs tarballs will usually have a subdirectory where it will be exploded at. That subdirectory must be specified as well in "Subdirectory of extracted archive", besides the download URL. For example, the above JDK will be extracted at <code>/var/jenkins_home/tools/hudson.model.JDK/openjdk8u332/jdk8u322-b06</code>, ie. the subdirectory to be specified <code>jdk8u322-b06</code>.
+
 
 ### JDK from Oracle
 Jenkins gives the option of automatically downloading and installing a JDK from Oracle, just that we'll need to provide our Oracle account credentials the first time. We'll see "Installing JDK requires Oracle account. Please enter your username/password". JDK installed this way will be places ad <code>/var/jenkins_home/tools/hudson.model.JDK</code>.
