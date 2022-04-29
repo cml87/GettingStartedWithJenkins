@@ -49,7 +49,10 @@ Notice how Jenkins installs maven at <code>/var/jenkins_home/tools/hudson.tasks.
 
 
 ## JDK
-It seems Jenkins comes with a default JDK at 
+
+See [How to Configure a JDK in Jenkins](https://youtu.be/qx3XK82BZPk)
+
+Jenkins itself is a Java application. Thus, it needs a JDK. My docker container running Jenkins comes with the following JDK Jenkins uses (see Manage Jenkins > System Information)
 ```shell
 /opt/java/openjdk$ ls -larth
 total 51M
@@ -84,9 +87,21 @@ JVM_VERSION="25.292-b10"
 IMAGE_TYPE="JDK"
 ```
 
-It seems Jenkins will use this JDK by default, if nothing is specified, for example in Freestyle project.
+Jenkins will use this JDK by default, if nothing is specified, for example in Freestyle project.
 
-We can manually copy (extract the .tar.gz) a JDK into <code>/usr/lib/jvm</code>:
+Other than the default JDK we can install ours under Global Tool Configuration. We'll have to set a name to each JDK installation so we can refer to it Jenkins files.
+
+### JDK from a download URL
+Another option is to specify the url of a JDK to download and install automatically. We do it under Add Installer > Extract *.zip/*.tar.gz. An example link for a JDK 8 could be<br>
+<code>https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u322-b06/OpenJDK8U-debugimage_x64_linux_hotspot_8u322b06.tar.gz</code>
+See (https://github.com/adoptium/temurin8-binaries/releases/)[https://github.com/adoptium/temurin8-binaries/releases/] for JDK URLs from Adopt, for example. Look for assets with "x64_linux_hotspot" in its name.
+
+
+### JDK from Oracle
+Jenkins gives the option of automatically downloading and installing a JDK from Oracle, just that we'll need to provide our Oracle account credentials the first time. We'll see "Installing JDK requires Oracle account. Please enter your username/password". JDK installed this way will be places ad <code>/var/jenkins_home/tools/hudson.model.JDK</code>.
+
+### Manual install of a JDK
+To manually add a JDK, we can manually copy (extract the .tar.gz) a JDK into <code>/usr/lib/jvm</code>:
 ```shell
 /usr/lib/jvm/jdk-11.0.12+1$ ls -larth
 total 40K
@@ -103,4 +118,3 @@ drwxr-xr-x  3 root root 4.0K Apr 29 10:22 ..
 ```
 If we want to use it we can set it in Global Tool Configuration, specifying under <b>JAVA_HOME</b> the installation directory <code>/usr/lib/jvm/jdk-11.0.12+1</code>.
 
-Each JDK installation will have name we can refer to in the Jenkins files.
