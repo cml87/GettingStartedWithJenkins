@@ -30,7 +30,26 @@ pipeline {
         stage ('Checkout') {
             steps {
                 //git branch: 'master', credentialsId: 'jenkins-laptop', url: 'git@github.com:cml87/SpringCore_1_forJenkins.git'
-                git branch: 'develop', credentialsId: 'jenkins-laptop', url: 'git@github.com:cml87/SpringCore_1_forJenkins.git'
+                //git branch: 'develop', credentialsId: 'jenkins-laptop', url: 'git@github.com:cml87/SpringCore_1_forJenkins.git'
+
+                checkout([$class: 'GitSCM', 
+                    branches: [[name: '**']],  //'*/master'   -> fix to include only the branches of gitflow
+                    extensions: [
+                        [$class: 'CloneOption', 
+                            honorRefspec: true, 
+                            noTags: false, 
+                            reference: '', 
+                            shallow: false], 
+                        [$class: 'PruneStaleBranch']
+                    ], 
+                    userRemoteConfigs: [[credentialsId: 'jenkins-laptop', 
+                                        refspec: '+refs/heads/*:refs/remotes/origin/*',   // the remote will be named origi
+                                        url: 'git@github.com:cml87/SpringCore_1_forJenkins.git']]
+                ])
+                sh "git branch -avv"
+                sh 'git show-ref --tag'
+                //sh "git fetch --all --tags"
+                sh "git tag -l"
 
             }
         }
@@ -38,6 +57,8 @@ pipeline {
         stage ('Checked out info') {
             steps {
                 sh "git branch -avv"
+                //sh 'git show-ref --tag'
+                sh "git tag -l"
                 sh "ls -larth"
             }
         }
@@ -45,19 +66,23 @@ pipeline {
         stage ('Get Full Semantic Version') {
             steps {
                 //sh "gitversion -config /opt/gitversion/GitVersion.yml"
+                
+                sh "git checkout develop"  // this should be the branch whose push event in the remote has triggered the build
+                
                 sh "gitversion -config /opt/gitversion/GitVersion.yml -output buildserver"
                 
                 script {
                     def props = readProperties file: 'gitversion.properties'
 
                     env.GitVersion_SemVer = props.GitVersion_SemVer
+                    env.GitVersion_FullSemVer = props.GitVersion_FullSemVer
                     env.GitVersion_BranchName = props.GitVersion_BranchName
-                    env.GitVersion_AssemblySemVer = props.GitVersion_AssemblySemVer
                     env.GitVersion_MajorMinorPatch = props.GitVersion_MajorMinorPatch
                     env.GitVersion_Sha = props.GitVersion_Sha
                 }
 
                 echo env.GitVersion_FullSemVer 
+                
 
             }
 
