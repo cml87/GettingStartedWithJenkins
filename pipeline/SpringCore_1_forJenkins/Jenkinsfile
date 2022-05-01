@@ -12,6 +12,7 @@ pipeline {
         
         stage ('Build/System Info') {
             steps {
+                sh ""
                 sh '''
                     env | grep -e PATH -e JAVA_HOME
                     which java
@@ -20,19 +21,55 @@ pipeline {
                 sh '''
                     mvn -version                
                 '''
+                sh "ls -larth /opt/gitversion"
+                
+                sh ""
             }
         }
-        
+
         stage ('Checkout') {
             steps {
-                git branch: 'main', credentialsId: 'jenkins-laptop', url: 'git@github.com:cml87/SpringCore_1_forJenkins.git'
+                //git branch: 'master', credentialsId: 'jenkins-laptop', url: 'git@github.com:cml87/SpringCore_1_forJenkins.git'
+                git branch: 'develop', credentialsId: 'jenkins-laptop', url: 'git@github.com:cml87/SpringCore_1_forJenkins.git'
+
             }
         }
         
+        stage ('Checked out info') {
+            steps {
+                sh "git branch -avv"
+                sh "ls -larth"
+            }
+        }
+
+        stage ('Get Full Semantic Version') {
+            steps {
+                //sh "gitversion -config /opt/gitversion/GitVersion.yml"
+                sh "gitversion -config /opt/gitversion/GitVersion.yml -output buildserver"
+                
+                script {
+                    def props = readProperties file: 'gitversion.properties'
+
+                    env.GitVersion_SemVer = props.GitVersion_SemVer
+                    env.GitVersion_BranchName = props.GitVersion_BranchName
+                    env.GitVersion_AssemblySemVer = props.GitVersion_AssemblySemVer
+                    env.GitVersion_MajorMinorPatch = props.GitVersion_MajorMinorPatch
+                    env.GitVersion_Sha = props.GitVersion_Sha
+                }
+
+                echo env.GitVersion_FullSemVer 
+
+            }
+
+
+        }
+
+
+
         stage('Test') {
             steps {
                // sh "mvn spring-javaformat:apply"
-                sh "mvn test"
+                sh "mvn test -Dversion=${env.GitVersion_FullSemVer}"
             }
 
             // post {
@@ -47,7 +84,7 @@ pipeline {
         
         stage ('Package') {
             steps {
-                sh "mvn package"
+                sh "mvn clean package -Dversion=${env.GitVersion_FullSemVer}"
             }
         }
     }
