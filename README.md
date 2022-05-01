@@ -53,7 +53,7 @@ Whatever the maven installation we use, Jenkins will configure it to use the JDK
 
 See [How to Configure a JDK in Jenkins](https://youtu.be/qx3XK82BZPk)
 
-Jenkins itself is a Java application. Thus, it needs a JDK. My docker container running Jenkins comes with the following JDK Jenkins uses (see Manage Jenkins > System Information)
+Jenkins itself is a Java application. Thus, it needs a JDK both in the Controller and in the agents. My docker container running Jenkins (as controller) comes with the following JDK Jenkins uses (see Manage Jenkins > System Information)
 ```shell
 /opt/java/openjdk$ ls -larth
 total 51M

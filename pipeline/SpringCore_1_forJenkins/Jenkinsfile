@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    // we can put tools inside a stage, ie. stage level, before the steps{} block
+    tools {
+        // Install this Maven version already configured
+        maven "maven_3_6_3"
+        jdk "openjdk11"
+    }
+
+    stages {
+        
+        stage ('Build/System Info') {
+            steps {
+                sh '''
+                    env | grep -e PATH -e JAVA_HOME
+                    which java
+                    java -version
+                '''
+                sh '''
+                    mvn -version                
+                '''
+            }
+        }
+        
+        stage ('Checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'jenkins-laptop', url: 'git@github.com:cml87/SpringCore_1_forJenkins.git'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh "mvn spring-javaformat:apply"
+                sh "mvn test"
+            }
+
+            // post {
+            //     // If Maven was able to run the tests, even if some of the test
+            //     // failed, record the test results and archive the jar file.
+            //     success {
+            //         junit '**/target/surefire-reports/TEST-*.xml'
+            //         archiveArtifacts 'target/*.jar'
+            //     }
+            // }
+        }
+        
+        stage ('Package') {
+            steps {
+                sh "mvn package"
+            }
+        }
+    }
+}
