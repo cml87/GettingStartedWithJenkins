@@ -10,6 +10,12 @@ pipeline {
 
     stages {
         
+        stage ("Clean WS") {
+            steps {
+                cleanWs()
+            }
+        }
+
         stage ('Build/System Info') {
             steps {
                 sh ""
@@ -43,23 +49,18 @@ pipeline {
                         [$class: 'PruneStaleBranch']
                     ], 
                     userRemoteConfigs: [[credentialsId: 'jenkins-laptop', 
-                                        refspec: '+refs/heads/*:refs/remotes/origin/*',   // the remote will be named origi
+                                        refspec: '+refs/heads/*:refs/remotes/origin/*',   // the remote will be named origin
                                         url: 'git@github.com:cml87/SpringCore_1_forJenkins.git']]
                 ])
-                sh "git branch -avv"
-                sh 'git show-ref --tag'
-                //sh "git fetch --all --tags"
-                sh "git tag -l"
-
             }
         }
         
         stage ('Checked out info') {
             steps {
-                sh "git branch -avv"
-                //sh 'git show-ref --tag'
-                sh "git tag -l"
                 sh "ls -larth"
+                sh "git branch -avv"
+                sh "git tag -l"
+                sh 'git show-ref --tag'
             }
         }
 
@@ -74,14 +75,13 @@ pipeline {
                 script {
                     def props = readProperties file: 'gitversion.properties'
 
-                    env.GitVersion_SemVer = props.GitVersion_SemVer
                     env.GitVersion_FullSemVer = props.GitVersion_FullSemVer
                     env.GitVersion_BranchName = props.GitVersion_BranchName
                     env.GitVersion_MajorMinorPatch = props.GitVersion_MajorMinorPatch
                     env.GitVersion_Sha = props.GitVersion_Sha
                 }
 
-                echo env.GitVersion_FullSemVer 
+                echo "FullSemVer: " + env.GitVersion_FullSemVer 
                 
 
             }
