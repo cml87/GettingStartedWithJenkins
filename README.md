@@ -124,3 +124,7 @@ drwxr-xr-x  3 root root 4.0K Apr 29 10:22 ..
 If we want to use it we can set it in Global Tool Configuration, specifying under <b>JAVA_HOME</b> the installation directory <code>/usr/lib/jvm/jdk-11.0.12+1</code>.
 
 When using Agents to run Jenkins builds, it is in the agents we need the JDKs installed.
+
+## Multibranch pipeline
+A multibranch job is a folder of pipeline jobs. Instead of having to create separate pipeline jobs for each of the branches, I can set up a single multibranch job, and it will find the branches that I will want to build.
+The multibranch pipeline job will discover the Jenkinsfile in the branches of the project configured under "Branch Sources". The job may notice changes (new commits) in this remote through manual or cron scans, or through webhooks sent from the remote to the Jenkins instance.

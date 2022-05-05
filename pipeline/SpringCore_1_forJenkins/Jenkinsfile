@@ -38,6 +38,7 @@ pipeline {
                 //git branch: 'master', credentialsId: 'jenkins-laptop', url: 'git@github.com:cml87/SpringCore_1_forJenkins.git'
                 //git branch: 'develop', credentialsId: 'jenkins-laptop', url: 'git@github.com:cml87/SpringCore_1_forJenkins.git'
 
+
                 checkout([$class: 'GitSCM', 
                     branches: [[name: '**']],  //'*/master'   -> fix to include only the branches of gitflow
                     extensions: [
