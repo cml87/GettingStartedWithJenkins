@@ -1,3 +1,10 @@
+
+These are my Jenkins notes. I will include notes from the courses
+
+1. Getting Started with Jenkins, by Wes Higbee, pluralsigh
+2. Using Declarative Jenkins Pipelines, by Elton Stoneman, pluralsight
+
+
 # Jenkins Getting Started
 
 ## 2nd Edition Examples **[CURRENT EDITION]**
@@ -128,3 +135,69 @@ When using Agents to run Jenkins builds, it is in the agents we need the JDKs in
 ## Multibranch pipeline
 A multibranch job is a folder of pipeline jobs. Instead of having to create separate pipeline jobs for each of the branches, I can set up a single multibranch job, and it will find the branches that I will want to build.
 The multibranch pipeline job will discover the Jenkinsfile in the branches of the project configured under "Branch Sources". The job may notice changes (new commits) in this remote through manual or cron scans, or through webhooks sent from the remote to the Jenkins instance.
+
+In a multibranch pipeline project we cannot configure the individual jobs of the branches. We can only configure the multibranch job itself. But we can configure what will be done for each branch, for example, through the different ways we can introduce conditional behavior in the Jenkins file. One is with the <code>when{}</code> block:
+```text
+pipeline {
+  agent any
+  
+  stages {
+    stage('Hello') {
+      steps {
+        echo "hello"
+      }
+    }
+    
+    stage ('Cat README') {
+      when {
+        branch "fix-*"  // this stage will be executed only for the branches
+      }                 // matching this pattern
+      steps {
+        sh '''
+  	      cat README.md
+  	    '''
+      }
+    }
+  }
+}
+```
+
+
+When it finds a branch with a Jenkins file after a scan, it fires up a job for that branch and will use that Jenkinsfile to build that branch. If the branch already exists, and we push a new commit to it, that may automatically trigger the build of the branch, or we may need to do it manually with "Build Now" from Jenkins.
+
+Saving the jog after changes in the GUI config is one of the events that trigger the scan of the configured remote (not the build of the branches in the remote). 
+
+One thing is the branches that our multibranch pipeline project discovers; another thing is the triggering of the builds for those branches. Of course, if brach is not, or have not been discovered yet, no build can be triggered for it. We can always trigger a scan of the remote, or a build of a given branch, manually, to see the changes we've made. 
+
+In the configuration of the job, under Branch Sources/Behaviors, we can add filters for the names of the branches we want the multibranch pipeline project be able to discover.
+
+From the Branch Source tab in the GUI config of the project we configure:
+1. How the branches in the remote will be discovered (eg. name, pattern)
+2. Additional behavior after the branch is discovered and when the build is triggered, eg.: clean workspace, checkout to the discovered brach etc. 
+
+The "additional behaviors" will affect what the build does before running the stages in the Jenkinsfile. They will make run git commands. For example, "Clean before checkout" will do:
+```text
+Cleaning workspace
+ > git rev-parse --verify HEAD # timeout=10
+Resetting working tree
+ > git reset --hard # timeout=10
+ > git clean -fdx # timeout=10
+```
+Similarly, "Checkout to matching local branch" will do:
+```text
+Checking out Revision bbe039ba8eeed61c6c5637d6fabbb21e3a2350f5 (main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f bbe039ba8eeed61c6c5637d6fabbb21e3a2350f5 # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git checkout -b main bbe039ba8eeed61c6c5637d6fabbb21e3a2350f5 # timeout=10
+```
+instead of just
+```text
+Checking out Revision bbe039ba8eeed61c6c5637d6fabbb21e3a2350f5 (main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f bbe039ba8eeed61c6c5637d6fabbb21e3a2350f5 # timeout=10
+```
+ie. notice how we checkout the branch main, instead of checking out its commit and staying detached.
+
+ When (eg. cron, automatically) the branches of the remote, and the commits on them, will be discovered, is configured under Scan Multibranch Pipeline Triggers, I think. We can always trigger a scan of the remote, or a build of a given branch, manually, to see the changes we've made. 
+
