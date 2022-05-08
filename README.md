@@ -2,9 +2,8 @@
 These are my Jenkins notes. I will include notes from the courses
 
 1. Getting Started with Jenkins, by Wes Higbee, pluralsigh
-2. Using Declarative Jenkins Pipelines, by Elton Stoneman, pluralsight
 
-
+___
 # Jenkins Getting Started
 
 ## 2nd Edition Examples **[CURRENT EDITION]**
@@ -43,9 +42,11 @@ See the [docs](docs) folder for various additional notes I've left for you. Quit
 - [1st Edition Overview/Resources Gist (https://git.io/vKSVZ)](https://git.io/vKSVZ)
   - I share these mostly to avoid confusion with associated repos and examples that are and will continue to remain accessibly here on GitHub.
 - This `Jenkinsfile` highlights a complex pipeline with multiple nodes involved and parallelism, for a challenge try to get this up and running on your own. Or at least read through it and grok what you think is needed to get it working.
+___
+
+# My Notes start here
 
 
-# My Notes
 
 ## Maven
 Jenkins will need maven configured. In Global Tool Configuration we can easily ask it to automatically install the maven versions we want from Apache, while giving a name to each installation. For example, if we decide to use version 3.6.3, this will be printed on the logs on the first time:
